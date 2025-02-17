@@ -8,10 +8,9 @@ const getHealth = async (req, res) => {
           timestamp: new Date().toISOString(),
         },
       };
-  
-      res.status(200).json(healthStatus);
+      res.success(healthStatus);
     } catch (error) {
-      res.status(500).json({
+      res.error({
         status: "error",
         message: "Internal Server Error",
       });
