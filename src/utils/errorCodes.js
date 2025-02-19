@@ -1,77 +1,129 @@
 const errorCodes = {
-    40001: {
-      reason: "ValidationInvalidField",
-      message: "Invalid parameter(s)",
-    },
-    40005: {
-      reason: "ValidationError",
-      message: "Email is already in use",
-    },
-    40006: {
-      reason: "ValidationError",
-      message: "Phone is already in use",
-    },
-    40007: {
-      reason: "ValidationInvalidField",
-      message: "Email format is not valid",
-    },
-    40008: {
-      reason: "ValidationInvalidField",
-      message: "Phone format is not valid",
-    },
-    40009: {
-      reason: "ValidationError",
-      message: "Phone number is not valid",
-    },
-    40102: {
-      reason: "InvalidPassword",
-      message: "Invalid password. Please try again.",
-    },
-    40103: {
-      reason: "Blocked",
-      message: "Your account is blocked. Please contact to customer support.",
-    },
-    40106: {
-      reason: "UserUnverified",
-      message: "User must verify phone number",
-    },
-    40107: {
-      reason: "UserUnverified",
-      message: "Old password does not matched",
-    },
-    // ================== Authorizer error codes ==================
-    40110: {
-      reason: "TokenExpired",
-      message: "Authentication failed: Token has expired'",
-    },
-    40111: {
-      reason: "InvalidToken",
-      message: "Token validation fail",
-    },
-    40112: {
-      reason: "InvalidToken",
-      message: "Token verification fail",
-    },
-    40113: {
-      reason: "NoTokenProvided",
-      message: "Authentication failed: No token provided",
-    },
-    40114: {
-      reason: "InsufficientPrivileges",
-      message: "Access denied. Admin privileges required.",
-    },
-    40125: {
-      reason: "PasswordValidationError",
-      message: "Wrong password.",
-    },
-    40401: {
-      reason: "NotFound",
-      message: "User not found",
-    },
-    50001: {
-      reason: "UnknownError",
-      message: "An unknown error occurred.",
-    },
-  };
-  
-  module.exports = { errorCodes };
+  // ================== 400 - Bad Request Errors ==================
+  40001: {
+    reason: "ValidationInvalidField",
+    message: "One or more fields contain invalid values.",
+  },
+  40002: {
+    reason: "MissingRequiredField",
+    message: "A required field is missing.",
+  },
+  40003: {
+    reason: "InvalidRequestBody",
+    message: "Request body format is invalid.",
+  },
+  40004: {
+    reason: "ValidationError",
+    message: "Invalid email format. Please provide a valid email.",
+  },
+  40005: {
+    reason: "DuplicateEmail",
+    message: "This email is already registered. Please use a different email.",
+  },
+  40006: {
+    reason: "DuplicatePhone",
+    message: "This phone number is already registered. Please use a different number.",
+  },
+  40007: {
+    reason: "InvalidPhoneFormat",
+    message: "Invalid phone number format. Please enter a valid phone number.",
+  },
+  40008: {
+    reason: "InvalidPasswordFormat",
+    message: "Password must meet security requirements.",
+  },
+  40009: {
+    reason: "WeakPassword",
+    message: "Password is too weak. Please use a stronger password.",
+  },
+
+  // ================== 401 - Unauthorized Errors ==================
+  40101: {
+    reason: "UnauthorizedAccess",
+    message: "You are not authorized to access this resource.",
+  },
+  40102: {
+    reason: "InvalidCredentials",
+    message: "Invalid email or password. Please try again.",
+  },
+  40103: {
+    reason: "AccountBlocked",
+    message: "Your account has been blocked. Please contact customer support.",
+  },
+  40104: {
+    reason: "AccountSuspended",
+    message: "Your account is suspended. Contact support for assistance.",
+  },
+  40105: {
+    reason: "PhoneVerificationRequired",
+    message: "You must verify your phone number before proceeding.",
+  },
+  40106: {
+    reason: "EmailVerificationRequired",
+    message: "You must verify your email before proceeding.",
+  },
+  40107: {
+    reason: "OldPasswordMismatch",
+    message: "The old password provided is incorrect.",
+  },
+
+  // ================== 403 - Forbidden Errors ==================
+  40301: {
+    reason: "AccessDenied",
+    message: "You do not have permission to perform this action.",
+  },
+  40302: {
+    reason: "InsufficientPrivileges",
+    message: "Admin privileges are required to access this resource.",
+  },
+
+  // ================== 404 - Not Found Errors ==================
+  40401: {
+    reason: "UserNotFound",
+    message: "User not found. Please check the details and try again.",
+  },
+  40402: {
+    reason: "ResourceNotFound",
+    message: "The requested resource was not found.",
+  },
+
+  // ================== 409 - Conflict Errors ==================
+  40901: {
+    reason: "DuplicateEntry",
+    message: "A record with the same details already exists.",
+  },
+
+  // ================== 500 - Internal Server Errors ==================
+  50001: {
+    reason: "InternalServerError",
+    message: "An unexpected error occurred. Please try again later.",
+  },
+  50002: {
+    reason: "DatabaseError",
+    message: "A database error occurred. Please try again later.",
+  },
+  50003: {
+    reason: "ServiceUnavailable",
+    message: "The service is temporarily unavailable. Please try again later.",
+  },
+
+  // ================== Token & Authentication Errors ==================
+  40110: {
+    reason: "TokenExpired",
+    message: "Authentication failed. Your session has expired.",
+  },
+  40111: {
+    reason: "InvalidToken",
+    message: "Invalid authentication token provided.",
+  },
+  40112: {
+    reason: "TokenVerificationFailed",
+    message: "Token verification failed. Please log in again.",
+  },
+  40113: {
+    reason: "NoTokenProvided",
+    message: "Authentication failed. No token provided.",
+  },
+};
+
+module.exports = { errorCodes };
