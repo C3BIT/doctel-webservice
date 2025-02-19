@@ -1,8 +1,4 @@
-import { Sequelize, Transaction } from "sequelize";
-import { createNamespace } from "cls-hooked";
-
-const namespace = createNamespace("my-namespace");
-Sequelize.useCLS(namespace);
+const { Sequelize, Transaction } = require("sequelize");
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -20,11 +16,15 @@ const sequelize = new Sequelize(
   }
 );
 
-try {
-  await sequelize.authenticate();
-  console.log("Connection has been established successfully.");
-} catch (error) {
-  console.error("Unable to connect to the database:", error);
-}
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Database connected successfully.");
+    await sequelize.sync({ force: false });
+    console.log("✅ Tables synced successfully.");
+  } catch (error) {
+    console.error("❌ Unable to connect to the database:", error);
+  }
+})();
 
-export default sequelize;
+module.exports = sequelize;

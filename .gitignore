@@ -4,7 +4,7 @@ node_modules
 package-lock.json
 
 # Environment varibales
-# .env
+.env
 # !.env*.dev
 
 # Code coverage

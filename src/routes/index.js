@@ -1,11 +1,16 @@
 const express = require("express");
 const devRoute = require("./health.route.js");
+const doctorRoute = require("./doctor.route.js");
 const router = express.Router();
 
 const defaultRoutes = [
   {
     path: "/dev",
     route: devRoute,
+  },
+  {
+    path: "/doctors",
+    route: doctorRoute,
   }
 ];
 
