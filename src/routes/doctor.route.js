@@ -3,6 +3,6 @@ const { registerDoctorController } = require('../controllers/doctor.controller.j
 
 const router = Router();
 
-router.get('/registration', registerDoctorController);
+router.post('/registration', registerDoctorController);
 
 module.exports = router;

@@ -14,4 +14,8 @@ const findDoctorByEmail = async (email) => {
   return await Doctor.findOne({ where: { email } });
 };
 
-module.exports = { registerDoctor, findDoctorByEmail };
+const findDoctorByPhone = async (phone) => {
+  return await Doctor.findOne({ where: { phone } });
+};
+
+module.exports = { registerDoctor, findDoctorByEmail, findDoctorByPhone };
