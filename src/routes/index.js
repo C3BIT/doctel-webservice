@@ -9,7 +9,7 @@ const defaultRoutes = [
     route: devRoute,
   },
   {
-    path: "/doctor",
+    path: "/doctors",
     route: doctorRoute,
   }
 ];
