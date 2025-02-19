@@ -18,4 +18,13 @@ const findDoctorByPhone = async (phone) => {
   return await Doctor.findOne({ where: { phone } });
 };
 
-module.exports = { registerDoctor, findDoctorByEmail, findDoctorByPhone };
+const verifyPassword = async (inputPassword, storedPassword) => {
+  return await bcrypt.compare(inputPassword, storedPassword);
+};
+
+module.exports = {
+  registerDoctor,
+  findDoctorByEmail,
+  findDoctorByPhone,
+  verifyPassword,
+};
