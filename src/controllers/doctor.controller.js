@@ -72,7 +72,11 @@ const loginDoctorController = async (req, res) => {
       });
     }
 
-    const token = generateToken(doctor);
+    const token = generateToken({
+      id: doctor.id,
+      email: doctor.email,
+      role: "doctor"
+    });
 
     return res.success(
       {
