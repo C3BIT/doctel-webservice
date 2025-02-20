@@ -1,4 +1,4 @@
-name: Deploy Doctel App
+name: Deploy Doctel WebService App
 
 on:
   push:
