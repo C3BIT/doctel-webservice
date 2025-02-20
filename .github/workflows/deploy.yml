@@ -3,7 +3,7 @@ name: Deploy Doctel WebService App
 on:
   push:
     branches:
-      - master  # which baranch to deploy 
+      - master  # Deploy only when pushing to master
 
 jobs:
   deploy:
@@ -22,20 +22,19 @@ jobs:
 
       - name: Deploy via SSH
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          set -e
-          
-          # Navigate to the project directory
-          cd ${{ secrets.PROJECT_PATH }} || exit 1
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e
+            
+            # Navigate to the project directory
+            cd ${{ secrets.PROJECT_PATH }} || exit 1
 
-          # Pull the latest code
-          git pull origin main
+            # Ensure we are on the correct branch
+            git checkout master
+            git pull origin master
 
-          # Install dependencies
-          npm install --production
+            # Install dependencies
+            npm install --production
 
-          # Restart the application with PM2
-          pm2 restart all || pm2 start npm --name "doctel-server-node" -- start
-          
-          exit
+            # Restart the application with PM2
+            pm2 restart "doctel-server-node" || pm2 start npm --name "doctel-server-node" -- start
           EOF
