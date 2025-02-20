@@ -1,0 +1,41 @@
+name: Deploy Doctel App
+
+on:
+  push:
+    branches:
+      - main  # Adjust the branch you want to trigger the deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          set -e
+          
+          # Navigate to the project directory
+          cd ${{ secrets.PROJECT_PATH }} || exit 1
+
+          # Pull the latest code
+          git pull origin main
+
+          # Install dependencies
+          npm install --production
+
+          # Restart the application with PM2
+          pm2 restart all || pm2 start npm --name "node-app" -- start
+          
+          exit
+          EOF
