@@ -3,7 +3,7 @@ name: Deploy Doctel WebService App
 on:
   push:
     branches:
-      - master  # Adjust the branch we want to trigger the deployment
+      - master  # which baranch to deploy 
 
 jobs:
   deploy:
