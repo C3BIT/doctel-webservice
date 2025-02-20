@@ -35,7 +35,7 @@ jobs:
           npm install --production
 
           # Restart the application with PM2
-          pm2 restart all || pm2 start npm --name "node-app" -- start
+          pm2 restart all || pm2 start npm --name "doctel-server-node" -- start
           
           exit
           EOF
