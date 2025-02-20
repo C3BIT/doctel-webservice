@@ -3,7 +3,7 @@ name: Deploy Doctel WebService App
 on:
   push:
     branches:
-      - master  # Deploy only when pushing to master
+      - master  # branch 
 
 jobs:
   deploy:
