@@ -3,7 +3,7 @@ name: Deploy Doctel WebService App
 on:
   push:
     branches:
-      - master  # branch 
+      - master  # Deploy on master branch
 
 jobs:
   deploy:
@@ -29,12 +29,16 @@ jobs:
             cd ${{ secrets.PROJECT_PATH }} || exit 1
 
             # Ensure we are on the correct branch
+            git fetch --all
             git checkout master
             git pull origin master
 
             # Install dependencies
             npm install --production
 
-            # Restart the application with PM2
-            pm2 restart "doctel-server-node" || pm2 start npm --name "doctel-server-node" -- start
+            # Restart the application with PM2 in the correct directory
+            pm2 restart doctel-server-node || pm2 start npm --name "doctel-server-node" --cwd ${{ secrets.PROJECT_PATH }} -- start
+
+            # Save PM2 process list to restart after reboot
+            pm2 save
           EOF
