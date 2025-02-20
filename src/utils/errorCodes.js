@@ -124,6 +124,11 @@ const errorCodes = {
     reason: "NoTokenProvided",
     message: "Authentication failed. No token provided.",
   },
+  40114: {
+    reason: "UnauthorizedRoleAccess",
+    message: "You do not have permission to access this resource.",
+  },
+  
 };
 
 module.exports = { errorCodes };
