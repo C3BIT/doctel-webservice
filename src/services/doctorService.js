@@ -22,9 +22,18 @@ const verifyPassword = async (inputPassword, storedPassword) => {
   return await bcrypt.compare(inputPassword, storedPassword);
 };
 
+const updateDoctorProfile = async (doctorId, updateData) => {
+  return await Doctor.update(updateData, {
+    where: { id: doctorId },
+    returning: true,
+  });
+};
+
+
 module.exports = {
   registerDoctor,
   findDoctorByEmail,
   findDoctorByPhone,
   verifyPassword,
+  updateDoctorProfile,
 };
