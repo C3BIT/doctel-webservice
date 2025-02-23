@@ -3,10 +3,14 @@ const {
   findDoctorByEmail,
   findDoctorByPhone,
   verifyPassword,
+  updateDoctorProfile,
 } = require("../services/doctorService");
 const { statusCodes } = require("../utils/statusCodes");
-const { doctorRegistrationSchema, doctorLoginSchema } = require("../validations/doctorValidation");
-const { errorResponseHandler } = require('../middlewares/errorResponseHandler');
+const {
+  doctorRegistrationSchema,
+  doctorLoginSchema,
+} = require("../validations/doctorValidation");
+const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { generateToken } = require("../utils/jwtHelper");
 const registerDoctorController = async (req, res) => {
   try {
@@ -33,11 +37,18 @@ const registerDoctorController = async (req, res) => {
         error: { code: 40006 },
       });
     }
-    const doctor = await registerDoctor({ firstName, lastName, email, phone, password, status });
+    const doctor = await registerDoctor({
+      firstName,
+      lastName,
+      email,
+      phone,
+      password,
+      status,
+    });
     const responseData = {
       name: `${doctor.firstName} ${doctor.lastName}`,
       email: doctor.email,
-      phone: doctor.phone
+      phone: doctor.phone,
     };
 
     return res.created(responseData, "Doctor registered successfully");
@@ -75,7 +86,7 @@ const loginDoctorController = async (req, res) => {
     const token = generateToken({
       id: doctor.id,
       email: doctor.email,
-      role: "doctor"
+      role: "doctor",
     });
 
     return res.success(
@@ -83,14 +94,45 @@ const loginDoctorController = async (req, res) => {
         name: `${doctor.firstName} ${doctor.lastName}`,
         email: doctor.email,
         phone: doctor.phone,
-        token
+        token,
       },
       "Doctor logged in successfully"
     );
-
   } catch (error) {
     errorResponseHandler(error, req, res);
   }
 };
 
-module.exports = { registerDoctorController, loginDoctorController };
+
+const updateDoctorProfileController = async (req, res) => {
+  try {
+    const { firstName, lastName, phone, status } = req.body;
+    const doctorId = req.user.id;
+    const updateData = {};
+    if (firstName) updateData.firstName = firstName;
+    if (lastName) updateData.lastName = lastName;
+    if (phone) updateData.phone = phone;
+    if (status) updateData.status = status;
+
+    if (Object.keys(updateData).length === 0) {
+      throw Object.assign(new Error(), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40002 },
+      });
+    }
+
+    const updatedDoctor = await updateDoctorProfile(doctorId, updateData);
+
+    return res.success(updatedDoctor, "Doctor profile updated successfully");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
+
+
+
+module.exports = {
+  registerDoctorController,
+  loginDoctorController,
+  updateDoctorProfileController,
+};
