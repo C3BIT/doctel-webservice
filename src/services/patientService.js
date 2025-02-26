@@ -1,12 +1,8 @@
 const Patient = require("../models/patient");
 
-const registerPatient = async ({ name, email, phone, dateOfBirth, gender, password }) => {
+const registerPatient = async ({ phone, password }) => {
   return await Patient.create({
-    name,
-    email,
     phone,
-    dateOfBirth,
-    gender,
     password,
   });
 };
