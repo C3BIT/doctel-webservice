@@ -36,6 +36,14 @@ const errorCodes = {
     reason: "WeakPassword",
     message: "Password is too weak. Please use a stronger password.",
   },
+  40010: {
+    reason: "PhoneRequired",
+    message: "Phone number is required",
+  },
+  40011: {
+    reason: "InvalidOtp",
+    message: "OTP verification failed",
+  },
 
   // ================== 401 - Unauthorized Errors ==================
   40101: {
@@ -90,7 +98,7 @@ const errorCodes = {
   // ================== 409 - Conflict Errors ==================
   40901: {
     reason: "DuplicateEntry",
-    message: "A record with the same details already exists.",
+    message: "An account with this phone number already exists",
   },
 
   // ================== 500 - Internal Server Errors ==================
