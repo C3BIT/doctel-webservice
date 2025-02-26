@@ -1,4 +1,4 @@
-const Patient = require("../models/patient");
+const Patient = require("../models/Patientt");
 const { Sequelize } = require("sequelize");
 
 const findPatientByPhone = async (phone) => {
@@ -18,8 +18,20 @@ const registerPatient = async ({ phone, password }) => {
     password,
   });
 };
-
+const updatePatientProfile = async (id, updateData) => {
+  try {
+    const patient = await Patient.findOne({ where: { id } });
+    if (!patient) {
+      throw new Error("Patient not found");
+    }
+    await patient.update(updateData);
+    return patient;
+  } catch (error) {
+    throw error;
+  }
+};
 module.exports = {
   registerPatient,
   findPatientByPhone,
+  updatePatientProfile
 };

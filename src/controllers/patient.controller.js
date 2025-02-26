@@ -52,7 +52,24 @@ const registerPatientController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
+const updatePatientProfileController = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const updateData = req.body;
+    if (!id) {
+      throw Object.assign(new Error("Invalid request: User ID is required"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40401 },
+      });
+    }
+    const updatedPatient = await PatientService.updatePatientProfile(id, updateData);
 
+    return res.success(updatedPatient, "Patient profile updated successfully.");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 module.exports = {
   registerPatientController,
+  updatePatientProfileController
 };
