@@ -1,8 +1,8 @@
 const bcrypt = require("bcryptjs");
-const statusCodes = require("../utils/statusCodes");
 const OtpService = require("../services/otpService");
 const PatientService = require("../services/patientService");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
+const { statusCodes } = require("../utils/statusCodes");
 
 const registerPatientController = async (req, res) => {
   try {
@@ -13,7 +13,13 @@ const registerPatientController = async (req, res) => {
         error: { code: 40002, reason: "All fields are required" },
       });
     }
-
+    const existingPatient = await PatientService.findPatientByPhone(phone);
+    if (existingPatient) {
+      throw Object.assign(new Error("Patient already exists"), {
+        status: statusCodes.CONFLICT,
+        error: { code: 40901 },
+      });
+    }
     const isValidOtp = await OtpService.verifyOtp(phone, otp);
     if (!isValidOtp) {
       throw Object.assign(new Error("Invalid or expired OTP"), {
@@ -21,10 +27,8 @@ const registerPatientController = async (req, res) => {
         error: { code: 40011 },
       });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newPatient = await PatientService.registerPatient({
+    await PatientService.registerPatient({
       phone,
       password: hashedPassword,
     });

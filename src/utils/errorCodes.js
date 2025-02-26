@@ -98,7 +98,7 @@ const errorCodes = {
   // ================== 409 - Conflict Errors ==================
   40901: {
     reason: "DuplicateEntry",
-    message: "A record with the same details already exists.",
+    message: "An account with this phone number already exists",
   },
 
   // ================== 500 - Internal Server Errors ==================
