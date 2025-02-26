@@ -4,6 +4,6 @@ const { registerPatientController, updatePatientProfileController } = require('.
 const router = Router();
 
 router.post('/registration', registerPatientController);
-router.post('/update/profile', updatePatientProfileController);
+router.put('/update/profile', updatePatientProfileController);
 
 module.exports = router;
