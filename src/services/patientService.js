@@ -21,9 +21,6 @@ const registerPatient = async ({ phone, password }) => {
 const updatePatientProfile = async (id, updateData) => {
   try {
     const patient = await Patient.findOne({ where: { id } });
-    if (!patient) {
-      throw new Error("Patient not found");
-    }
     await patient.update(updateData);
     return patient;
   } catch (error) {

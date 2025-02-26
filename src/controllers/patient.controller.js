@@ -3,7 +3,7 @@ const OtpService = require("../services/otpService");
 const PatientService = require("../services/patientService");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { statusCodes } = require("../utils/statusCodes");
-const { patientRegistrationSchema } = require("../validations/patientValidation");
+const { patientRegistrationSchema,patientUpdateSchema } = require("../validations/patientValidation");
 
 const registerPatientController = async (req, res) => {
   try {
@@ -56,10 +56,21 @@ const updatePatientProfileController = async (req, res) => {
   try {
     const { id } = req.user;
     const updateData = req.body;
-    if (!id) {
-      throw Object.assign(new Error("Invalid request: User ID is required"), {
+    const { error } = patientUpdateSchema.validate(updateData, { abortEarly: false });
+
+    if (error) {
+      const errorDetails = error.details.map(detail => ({
+        field: detail.path[0],
+        message: detail.message,
+      }));
+
+      throw Object.assign(new Error("Validation failed"), {
         status: statusCodes.BAD_REQUEST,
-        error: { code: 40401 },
+        error: {
+          code: 40002,
+          reason: "Validation error",
+          details: errorDetails,
+        },
       });
     }
     const updatedPatient = await PatientService.updatePatientProfile(id, updateData);
