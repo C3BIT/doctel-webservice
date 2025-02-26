@@ -36,6 +36,14 @@ const errorCodes = {
     reason: "WeakPassword",
     message: "Password is too weak. Please use a stronger password.",
   },
+  40010: {
+    reason: "PhoneRequired",
+    message: "Phone number is required",
+  },
+  40011: {
+    reason: "InvalidOtp",
+    message: "OTP verification failed",
+  },
 
   // ================== 401 - Unauthorized Errors ==================
   40101: {
