@@ -23,10 +23,17 @@ const verifyPassword = async (inputPassword, storedPassword) => {
 };
 
 const updateDoctorProfile = async (doctorId, updateData) => {
-  return await Doctor.update(updateData, {
-    where: { id: doctorId },
-    returning: true,
+  const [rowsUpdated] = await Doctor.update(updateData, {
+    where: { id: doctorId }
   });
+  
+  if (rowsUpdated > 0) {
+    return await Doctor.findByPk(doctorId, {
+      attributes: { exclude: ['id','phone', 'password', 'email', 'createdAt', 'updatedAt'] }
+    });
+  }
+  
+  return null;
 };
 
 
