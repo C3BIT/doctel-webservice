@@ -1,4 +1,4 @@
-const Patient = require("../models/Patientt");
+const Patient = require("../models/Patient");
 const { Sequelize } = require("sequelize");
 
 const findPatientByPhone = async (phone) => {

@@ -54,27 +54,17 @@ const registerPatientController = async (req, res) => {
 };
 const updatePatientProfileController = async (req, res) => {
   try {
-    const { id } = req.user;
     const updateData = req.body;
     const { error } = patientUpdateSchema.validate(updateData, { abortEarly: false });
-
     if (error) {
-      const errorDetails = error.details.map(detail => ({
-        field: detail.path[0],
-        message: detail.message,
-      }));
-
-      throw Object.assign(new Error("Validation failed"), {
+      throw Object.assign(new Error("Patient profile update failed"), {
         status: statusCodes.BAD_REQUEST,
         error: {
-          code: 40002,
-          reason: "Validation error",
-          details: errorDetails,
+          code: 40002
         },
       });
     }
     const updatedPatient = await PatientService.updatePatientProfile(id, updateData);
-
     return res.success(updatedPatient, "Patient profile updated successfully.");
   } catch (error) {
     errorResponseHandler(error, req, res);
