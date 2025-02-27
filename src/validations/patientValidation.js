@@ -34,7 +34,18 @@ const patientRegistrationSchema = Joi.object({
       'any.required': 'OTP is required'
     })
 });
-
+const patientUpdateSchema = Joi.object({
+  firstName: Joi.string().max(50).optional(),
+  lastName: Joi.string().max(50).optional(),
+  email: Joi.string().email().max(100).optional(),
+  phone: Joi.string().pattern(/^[0-9]+$/).min(10).max(20).optional(),
+  dateOfBirth: Joi.date().optional(),
+  gender: Joi.string().valid("Male", "Female", "Other").optional(),
+  address: Joi.string().optional(),
+  height: Joi.number().min(30).max(250).optional(),
+  weight: Joi.number().min(2).max(300).optional(),
+}).min(1);
 module.exports = {
-  patientRegistrationSchema
+  patientRegistrationSchema,
+  patientUpdateSchema
 };

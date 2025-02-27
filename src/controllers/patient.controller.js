@@ -3,7 +3,7 @@ const OtpService = require("../services/otpService");
 const PatientService = require("../services/patientService");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { statusCodes } = require("../utils/statusCodes");
-const { patientRegistrationSchema } = require("../validations/patientValidation");
+const { patientRegistrationSchema,patientUpdateSchema } = require("../validations/patientValidation");
 
 const registerPatientController = async (req, res) => {
   try {
@@ -52,7 +52,25 @@ const registerPatientController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
-
+const updatePatientProfileController = async (req, res) => {
+  try {
+    const updateData = req.body;
+    const { error } = patientUpdateSchema.validate(updateData, { abortEarly: false });
+    if (error) {
+      throw Object.assign(new Error("Patient profile update failed"), {
+        status: statusCodes.BAD_REQUEST,
+        error: {
+          code: 40002
+        },
+      });
+    }
+    const updatedPatient = await PatientService.updatePatientProfile(id, updateData);
+    return res.success(updatedPatient, "Patient profile updated successfully.");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 module.exports = {
   registerPatientController,
+  updatePatientProfileController
 };
