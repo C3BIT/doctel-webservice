@@ -65,6 +65,10 @@ const Patient = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    profileImage: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+  },
     status: {
       type: DataTypes.ENUM("active", "inactive", "banned"),
       defaultValue: "active",

@@ -32,7 +32,11 @@ const Doctor = sequelize.define('Doctor', {
     password: {
         type: DataTypes.STRING(255),
         allowNull: false
-    }
+    },
+    profileImage: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+    },
 }, {
     timestamps: true,
     tableName: 'doctors'

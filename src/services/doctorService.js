@@ -36,11 +36,20 @@ const updateDoctorProfile = async (doctorId, updateData) => {
   return null;
 };
 
-
+const updateDoctorImage = async (doctorId, imageUrl) => {
+  return await Doctor.update(
+    { profileImage: imageUrl },
+    { 
+      where: { id: doctorId },
+      returning: true 
+    }
+  );
+};
 module.exports = {
   registerDoctor,
   findDoctorByEmail,
   findDoctorByPhone,
   verifyPassword,
   updateDoctorProfile,
+  updateDoctorImage
 };
