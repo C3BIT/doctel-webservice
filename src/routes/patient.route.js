@@ -1,6 +1,5 @@
 const { Router } = require('express');
-const { registerPatientController, loginPatientController } = require('../controllers/patient.controller');
-const { registerPatientController, updatePatientProfileController } = require('../controllers/patient.controller');
+const { registerPatientController, updatePatientProfileController, loginPatientController } = require('../controllers/patient.controller');
 const { authenticatePatient } = require('../middlewares/authMiddleware');
 
 const router = Router();

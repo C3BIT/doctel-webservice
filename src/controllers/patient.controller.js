@@ -3,27 +3,34 @@ const OtpService = require("../services/otpService");
 const PatientService = require("../services/patientService");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { statusCodes } = require("../utils/statusCodes");
-const { patientRegistrationSchema } = require("../validations/patientValidation");
+const {
+  patientRegistrationSchema,
+  patientLoginSchema,
+} = require("../validations/patientValidation");
+const { generatePatientToken } = require("../utils/jwtHelper");
 
 const registerPatientController = async (req, res) => {
   try {
     const { phone, password, otp } = req.body;
-    const { error } = patientRegistrationSchema.validate({phone, password, otp }, { 
-      abortEarly: false 
-    });
-    
+    const { error } = patientRegistrationSchema.validate(
+      { phone, password, otp },
+      {
+        abortEarly: false,
+      }
+    );
+
     if (error) {
-      const errorDetails = error.details.map(detail => ({
+      const errorDetails = error.details.map((detail) => ({
         field: detail.path[0],
-        message: detail.message
+        message: detail.message,
       }));
-      
+
       throw Object.assign(new Error("Validation failed"), {
         status: statusCodes.BAD_REQUEST,
-        error: { 
-          code: 40002, 
-          reason: "Validation error", 
-          details: errorDetails 
+        error: {
+          code: 40002,
+          reason: "Validation error",
+          details: errorDetails,
         },
       });
     }
@@ -55,21 +62,69 @@ const registerPatientController = async (req, res) => {
 const updatePatientProfileController = async (req, res) => {
   try {
     const updateData = req.body;
-    const { error } = patientUpdateSchema.validate(updateData, { abortEarly: false });
+    const { error } = patientUpdateSchema.validate(updateData, {
+      abortEarly: false,
+    });
     if (error) {
       throw Object.assign(new Error("Patient profile update failed"), {
         status: statusCodes.BAD_REQUEST,
         error: {
-          code: 40002
+          code: 40002,
         },
       });
     }
-    const updatedPatient = await PatientService.updatePatientProfile(id, updateData);
+    const updatedPatient = await PatientService.updatePatientProfile(
+      id,
+      updateData
+    );
     return res.success(updatedPatient, "Patient profile updated successfully.");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
+const loginPatientController = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+
+    const { error } = patientLoginSchema.validate(req.body, {
+      abortEarly: false,
+    });
+
+    if (error) {
+      const errorDetails = error.details.map((detail) => ({
+        field: detail.path[0],
+        message: detail.message,
+      }));
+
+      throw Object.assign(new Error("Validation failed"), {
+        status: statusCodes.BAD_REQUEST,
+        error: {
+          code: 40002,
+          reason: "Validation error",
+          details: errorDetails,
+        },
+      });
+    }
+
+    const isValidOtp = await OtpService.verifyOtp(phone, otp);
+    if (!isValidOtp) {
+      throw Object.assign(new Error("Invalid or expired OTP"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40011 },
+      });
+    }
+
+    let patient = await PatientService.findPatientByPhone(phone);
+
+    const token = generatePatientToken({ id: patient.id, role: "patient" });
+
+    return res.success({ phone, token }, "Patient logged in successfully.");
   } catch (error) {
     errorResponseHandler(error, req, res);
   }
 };
 module.exports = {
   registerPatientController,
+  updatePatientProfileController,
+  loginPatientController,
 };
