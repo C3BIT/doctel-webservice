@@ -4,6 +4,7 @@ const PatientService = require("../services/patientService");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { statusCodes } = require("../utils/statusCodes");
 const { patientRegistrationSchema } = require("../validations/patientValidation");
+const { generatePatientToken } = require("../utils/jwtHelper");
 
 const registerPatientController = async (req, res) => {
   try {
@@ -55,4 +56,5 @@ const registerPatientController = async (req, res) => {
 
 module.exports = {
   registerPatientController,
+  loginPatientController
 };

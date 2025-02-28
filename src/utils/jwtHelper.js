@@ -10,5 +10,13 @@ const generateToken = (doctor) => {
 
   return jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRATION });
 };
+const generatePatientToken = (data) => {
+  const payload = {
+    id: data.id,
+    role: data.role
+  };
 
-module.exports = { generateToken };
+  return jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRATION });
+};
+
+module.exports = { generateToken, generatePatientToken };
