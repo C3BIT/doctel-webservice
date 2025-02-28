@@ -4,6 +4,7 @@ const {
   findDoctorByPhone,
   verifyPassword,
   updateDoctorProfile,
+  updateDoctorImage,
 } = require("../services/doctorService");
 const { statusCodes } = require("../utils/statusCodes");
 const {
@@ -12,6 +13,7 @@ const {
 } = require("../validations/doctorValidation");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { generateToken } = require("../utils/jwtHelper");
+const { generateFileUrl } = require("../utils/uploadUtils");
 const registerDoctorController = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, password, status } = req.body;
@@ -103,7 +105,6 @@ const loginDoctorController = async (req, res) => {
   }
 };
 
-
 const updateDoctorProfileController = async (req, res) => {
   try {
     const { firstName, lastName, phone, status } = req.body;
@@ -129,10 +130,32 @@ const updateDoctorProfileController = async (req, res) => {
   }
 };
 
+const uploadDoctorProfileImage = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    if (!req.file) {
+      throw Object.assign(new Error("No image file provided"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40002 },
+      });
+    }
 
+    const relativePath = `/uploads/profiles/${req.file.filename}`;
+    const imageUrl = generateFileUrl(req, relativePath);
+
+    await updateDoctorImage(doctorId, imageUrl);
+    return res.success(
+      {imageUrl },
+      "Profile image uploaded successfully"
+    );
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 
 module.exports = {
   registerDoctorController,
   loginDoctorController,
   updateDoctorProfileController,
+  uploadDoctorProfileImage
 };

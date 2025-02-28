@@ -45,7 +45,26 @@ const patientUpdateSchema = Joi.object({
   height: Joi.number().min(30).max(250).optional(),
   weight: Joi.number().min(2).max(300).optional(),
 }).min(1);
+
+const patientLoginSchema = Joi.object({
+  phone: Joi.string()
+    .pattern(/^\d{10,15}$/)
+    .required()
+    .messages({
+      "string.empty": "Phone number is required.",
+      "string.pattern.base": "Phone number must be between 10 and 15 digits.",
+    }),
+  otp: Joi.string()
+    .pattern(/^\d{4,6}$/)
+    .required()
+    .messages({
+      "string.empty": "OTP is required.",
+      "string.pattern.base": "OTP must be between 4 and 6 digits.",
+    }),
+});
+
 module.exports = {
   patientRegistrationSchema,
-  patientUpdateSchema
+  patientUpdateSchema,
+  patientLoginSchema
 };
