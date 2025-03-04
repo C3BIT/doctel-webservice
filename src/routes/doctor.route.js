@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const multer = require("multer");
 const {
   registerDoctorController,
   loginDoctorController,
@@ -9,7 +10,13 @@ const { authenticateDoctor } = require("../middlewares/authMiddleware.js");
 const { profileImageUpload } = require("../configs/multer.js");
 
 const router = Router();
-
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
 router.post("/registration", registerDoctorController);
 router.post("/login", loginDoctorController);
 router.put(
@@ -20,7 +27,7 @@ router.put(
 router.post(
   "/profile-image",
   authenticateDoctor,
-  profileImageUpload.single("profileImage"),
+  upload.single("file"),
   uploadDoctorProfileImage
 );
 module.exports = router;
