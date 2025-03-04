@@ -13,7 +13,7 @@ const {
 } = require("../validations/doctorValidation");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { generateToken } = require("../utils/jwtHelper");
-const { generateFileUrl } = require("../utils/uploadUtils");
+const spaceService = require("../services/spaceService");
 const registerDoctorController = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, password, status } = req.body;
@@ -139,15 +139,11 @@ const uploadDoctorProfileImage = async (req, res) => {
         error: { code: 40002 },
       });
     }
-
-    const relativePath = `/uploads/profiles/${req.file.filename}`;
-    const imageUrl = generateFileUrl(req, relativePath);
-
-    await updateDoctorImage(doctorId, imageUrl);
-    return res.success(
-      {imageUrl },
-      "Profile image uploaded successfully"
+    const imageUrl = await spaceService.profileFileUpload(
+      req.file
     );
+    await updateDoctorImage(doctorId, imageUrl);
+    return res.success({ imageUrl }, "Profile image uploaded successfully");
   } catch (error) {
     errorResponseHandler(error, req, res);
   }
@@ -157,5 +153,5 @@ module.exports = {
   registerDoctorController,
   loginDoctorController,
   updateDoctorProfileController,
-  uploadDoctorProfileImage
+  uploadDoctorProfileImage,
 };
