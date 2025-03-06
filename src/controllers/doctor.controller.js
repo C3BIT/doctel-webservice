@@ -14,6 +14,7 @@ const {
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { generateToken } = require("../utils/jwtHelper");
 const spaceService = require("../services/spaceService");
+const { verifyOtp } = require("../services/otpService");
 const registerDoctorController = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, password, status } = req.body;
@@ -61,40 +62,34 @@ const registerDoctorController = async (req, res) => {
 
 const loginDoctorController = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { phone, otp } = req.body;
     const { error } = doctorLoginSchema.validate(req.body);
     if (error) {
-      throw Object.assign(new Error(error.details[0].message), {
+      throw Object.assign(new Error(), {
         status: statusCodes.BAD_REQUEST,
-        error: { code: 40001 },
+        error: { code: 40001 , errors: error.details.map((err) => err.message),},
       });
     }
-    const doctor = await findDoctorByEmail(email);
+    const isOtpValid = await verifyOtp(phone, otp);
+    if (!isOtpValid) {
+      throw Object.assign(new Error("Invalid or expired OTP"), {
+        status: statusCodes.UNAUTHORIZED,
+        error: { code: 40011 },
+      });
+    }
+    let doctor = await findDoctorByPhone(phone);
     if (!doctor) {
-      throw Object.assign(new Error("Invalid email or password"), {
-        status: statusCodes.UNAUTHORIZED,
-        error: { code: 40102 },
-      });
-    }
-
-    const isPasswordValid = await verifyPassword(password, doctor.password);
-    if (!isPasswordValid) {
-      throw Object.assign(new Error("Invalid email or password"), {
-        status: statusCodes.UNAUTHORIZED,
-        error: { code: 40102 },
-      });
+      doctor = await registerDoctor(phone);
     }
 
     const token = generateToken({
       id: doctor.id,
-      email: doctor.email,
+      phone: doctor.phone,
       role: "doctor",
     });
 
     return res.success(
       {
-        name: `${doctor.firstName} ${doctor.lastName}`,
-        email: doctor.email,
         phone: doctor.phone,
         token,
       },

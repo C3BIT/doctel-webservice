@@ -12,8 +12,13 @@ const doctorRegistrationSchema = Joi.object({
 });
 
 const doctorLoginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
+  phone: Joi.string()
+    .pattern(/^\d{10,15}$/)
+    .required(),
+  otp: Joi.string()
+    .length(4)
+    .pattern(/^\d{4}$/)
+    .required(),
 });
 
 module.exports = { doctorRegistrationSchema, doctorLoginSchema };
