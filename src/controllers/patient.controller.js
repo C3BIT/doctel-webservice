@@ -115,6 +115,11 @@ const loginPatientController = async (req, res) => {
     }
 
     let patient = await PatientService.findPatientByPhone(phone);
+    if (!patient) {
+      patient = await PatientService.registerPatient({
+        phone,
+      });
+    }
 
     const token = generatePatientToken({ id: patient.id, role: "patient" });
 

@@ -14,8 +14,7 @@ const findPatientByPhone = async (phone) => {
 
 const registerPatient = async ({ phone, password }) => {
   return await Patient.create({
-    phone,
-    password,
+    phone
   });
 };
 const updatePatientProfile = async (id, updateData) => {
