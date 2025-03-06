@@ -65,9 +65,13 @@ const loginDoctorController = async (req, res) => {
     const { phone, otp } = req.body;
     const { error } = doctorLoginSchema.validate(req.body);
     if (error) {
+      const errorDetails = error.details.map((detail) => ({
+        field: detail.path[0],
+        message: detail.message,
+      }));
       throw Object.assign(new Error(), {
         status: statusCodes.BAD_REQUEST,
-        error: { code: 40001 , errors: error.details.map((err) => err.message),},
+        error: { code: 40001, details: errorDetails },
       });
     }
     const isOtpValid = await verifyOtp(phone, otp);
@@ -134,9 +138,7 @@ const uploadDoctorProfileImage = async (req, res) => {
         error: { code: 40002 },
       });
     }
-    const imageUrl = await spaceService.profileFileUpload(
-      req.file
-    );
+    const imageUrl = await spaceService.profileFileUpload(req.file);
     await updateDoctorImage(doctorId, imageUrl);
     return res.success({ imageUrl }, "Profile image uploaded successfully");
   } catch (error) {

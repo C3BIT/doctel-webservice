@@ -61,10 +61,6 @@ const Patient = sequelize.define(
         max: 300,
       },
     },
-    password: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
     profileImage: {
       type: DataTypes.STRING(255),
       allowNull: true,
