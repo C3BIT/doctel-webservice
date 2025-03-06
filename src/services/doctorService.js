@@ -1,10 +1,9 @@
 const Doctor = require("../models/doctor");
 const bcrypt = require("bcryptjs");
 
-const registerDoctor = async (data) => {
+const registerDoctor = async (phone) => {
   try {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    return await Doctor.create({ ...data, password: hashedPassword });
+    return await Doctor.create({ phone });
   } catch (error) {
     throw error;
   }

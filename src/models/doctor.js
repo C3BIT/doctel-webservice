@@ -9,16 +9,11 @@ const Doctor = sequelize.define('Doctor', {
     },
     firstName: {
         type: DataTypes.STRING(50),
-        allowNull: false
+        allowNull: true
     },
     lastName: {
         type: DataTypes.STRING(50),
-        allowNull: false
-    },
-    email: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        unique: true
+        allowNull: true
     },
     phone: {
         type: DataTypes.STRING(20),
@@ -28,10 +23,6 @@ const Doctor = sequelize.define('Doctor', {
     status: {
         type: DataTypes.ENUM('online', 'offline', 'busy', 'connected'),
         defaultValue: 'offline'
-    },
-    password: {
-        type: DataTypes.STRING(255),
-        allowNull: false
     },
     profileImage: {
         type: DataTypes.STRING(255),
