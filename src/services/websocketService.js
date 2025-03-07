@@ -4,7 +4,6 @@ const { authenticateSocket } = require("../middlewares/socketAuth");
 
 const initializeWebSocket = (server) => {
     const io = socketIo(server, { cors: { origin: "*" } });
-    console.log("==========asche=========")
     io.use(authenticateSocket);
 
     io.on("connection", (socket) => {
@@ -14,10 +13,7 @@ const initializeWebSocket = (server) => {
         console.log(`User connected: ${socketId} | Role: ${role}`);
         addUser(id, role, socketId);
         const onlineUsers = getOnlineUsersWithInfo();
-        console.log("==========list of online users===========", onlineUsers)
         io.emit("doctor:list", findAvailableDoctor());
-
-
         socket.on("doctor:busy", () => {
             if (role === "doctor") {
                 updateUserStatus(id, "busy");
@@ -60,7 +56,6 @@ const initializeWebSocket = (server) => {
         });
 
         socket.on("disconnect", () => {
-            console.log("===============remove===========",socketId)
             removeUser(socketId);
             io.emit("doctor:list", findAvailableDoctor());
         });
