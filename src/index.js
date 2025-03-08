@@ -5,6 +5,7 @@ const routes = require("./routes/index.js");
 const { PORT } = require("./configs/variables.js");
 const bodyParser = require("body-parser");
 const { responseHandler } = require("./middlewares/responseHandler.js");
+const { initializeWebSocket } = require("./services/websocketService.js");
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -18,5 +19,5 @@ app.use("/api", routes);
 const server = app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at ${PORT}`);
 });
-
+initializeWebSocket(server);
 module.exports = server;

@@ -1,3 +1,6 @@
+const NodeCache = require("node-cache");
+const otpCache = new NodeCache();
+
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const OTP = require("../services/otpService");
 const { statusCodes } = require("../utils/statusCodes");
