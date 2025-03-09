@@ -63,6 +63,9 @@ const initializeWebSocket = (server) => {
     socket.on("disconnect", () => {
       removeUser(socketId);
       io.emit("doctor:list", findAvailableDoctor());
+      const connected  = getOnlineUsersWithInfo();
+      console.log("============socketId=========",socketId)
+      console.log("=============connected=========", connected)
     });
   });
 };
