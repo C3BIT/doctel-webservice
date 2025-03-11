@@ -13,6 +13,7 @@ const authenticateSocket = async (socket, next) => {
     socket.user = {
       id: decoded.id,
       role: decoded.role,
+      phone: decoded.phone
     };
     next();
   } catch (error) {

@@ -1,11 +1,10 @@
 const { doctorCache } = require("../utils/memoryCache");
-const { v4: uuidv4 } = require("uuid");
 
-const addUser = (id, role, socketId) => {
-  const uniqueKey = `${role}_${uuidv4()}`;
+const addUser = (phone, role, socketId) => {
+  const uniqueKey = `${role}_${phone}`;
 
   doctorCache.set(uniqueKey, {
-    id,
+    phone,
     socketId,
     role,
     status: role === "doctor" ? "online" : "patient",
@@ -14,7 +13,8 @@ const addUser = (id, role, socketId) => {
   return uniqueKey;
 };
 
-const updateUserStatus = (uniqueKey, status) => {
+const updateUserStatus = (phone, role, status) => {
+  const uniqueKey = `${role}_${phone}`;
   let user = doctorCache.get(uniqueKey);
   if (user) {
     user.status = status;
@@ -30,28 +30,29 @@ const removeUser = (socketId) => {
   });
 };
 
-const findAvailableDoctor = () => {
-  return doctorCache.keys().find((key) => {
-    const user = doctorCache.get(key);
-    return user?.role === "doctor" && user?.status === "online";
-  });
+const findAvailableDoctors = () => {
+  return doctorCache.keys()
+    .map((key) => doctorCache.get(key))
+    .filter((user) => user?.role === "doctor" && user?.status === "online");
 };
 
 const getOnlineUsersWithInfo = () => {
-  const users = doctorCache.mget(doctorCache.keys());
-  return Object.entries(users).map(([key, data]) => ({
-    key,
-    id: data.id,
-    role: data.role,
-    status: data.status,
-    socketId: data.socketId
-  }));
+  return doctorCache.keys().map((key) => {
+    const user = doctorCache.get(key);
+    return {
+      key,
+      phone: user.phone,
+      role: user.role,
+      status: user.status,
+      socketId: user.socketId,
+    };
+  });
 };
 
 module.exports = {
   addUser,
   updateUserStatus,
   removeUser,
-  findAvailableDoctor,
+  findAvailableDoctors,
   getOnlineUsersWithInfo,
 };

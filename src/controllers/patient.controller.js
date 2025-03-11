@@ -121,7 +121,11 @@ const loginPatientController = async (req, res) => {
       });
     }
 
-    const token = generatePatientToken({ id: patient.id, role: "patient" });
+    const token = generatePatientToken({
+      id: patient.id,
+      phone: patient.phone,
+      role: "patient",
+    });
 
     return res.success({ phone, token }, "Patient logged in successfully.");
   } catch (error) {
