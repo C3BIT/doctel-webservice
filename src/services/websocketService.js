@@ -1,4 +1,5 @@
 const socketIo = require("socket.io");
+const crypto = require("crypto");
 const {
   addUser,
   updateUserStatus,
@@ -13,49 +14,75 @@ const initializeWebSocket = (server) => {
   io.use(authenticateSocket);
 
   io.on("connection", (socket) => {
-    const { id, role } = socket.user;
+    const { id, role, phone } = socket.user;
     const socketId = socket.id.toString();
 
     console.log(`User connected: ${socketId} | Role: ${role}`);
-    addUser(id, role, socketId);
+    addUser(phone, role, socketId);
     const onlineUsers = getOnlineUsersWithInfo();
-    console.log("=============onlineUsers=========", onlineUsers)
+    console.log("=============onlineUsers=========", onlineUsers);
     io.emit("doctor:list", findAvailableDoctor());
     socket.on("doctor:busy", () => {
       if (role === "doctor") {
-        updateUserStatus(id, "busy");
+        updateUserStatus(phone, role, "busy");
         io.emit("doctor:list", findAvailableDoctor());
       }
     });
 
     socket.on("doctor:free", () => {
       if (role === "doctor") {
-        updateUserStatus(id, "online");
+        updateUserStatus(phone, role, "online");
         io.emit("doctor:list", findAvailableDoctor());
       }
     });
 
     socket.on("call:initiate", () => {
       if (role === "patient") {
-        const availableDoctorId = findAvailableDoctor();
-        if (!availableDoctorId) {
+        const selectedDoctor = findAvailableDoctor();
+
+        if (!selectedDoctor) {
           socket.emit("call:failed", { message: "No available doctors" });
           return;
         }
-        io.to(availableDoctorId).emit("call:request", { patientId: id });
+
+        const roomId = crypto
+          .createHash("sha256")
+          .update(`${phone}_${selectedDoctor.phone}`)
+          .digest("hex")
+          .slice(0, 16);
+
+        const jitsiRoomLink = `https://call.bloomattires.com/${roomId}`;
+
+        io.to(selectedDoctor.socketId).emit("call:request", {
+          patientId: phone,
+          jitsiRoom: jitsiRoomLink,
+        });
+        io.to(socketId).emit("call:initiated", {
+          doctorId: selectedDoctor.phone,
+          jitsiRoom: jitsiRoomLink,
+        });
+
+        console.log(
+          `📞 Call initiated: Patient ${id} ↔ Doctor ${selectedDoctor.id}`
+        );
+        console.log(`🔗 Jitsi Room: ${jitsiRoomLink}`);
+        // updateUserStatus(selectedDoctor.id, "busy");
+        io.emit("doctor:list", findAvailableDoctor());
       }
     });
 
     socket.on("call:accept", () => {
+      console.log("==========accepted call===========");
       if (role === "doctor") {
-        updateUserStatus(id, "busy");
+        updateUserStatus(phone, role, "busy");
         io.emit("doctor:list", findAvailableDoctor());
       }
     });
 
     socket.on("call:reject", () => {
+      console.log("==========rejected call===========");
       if (role === "doctor") {
-        updateUserStatus(id, "online");
+        updateUserStatus(phone, role, "online");
         io.emit("doctor:list", findAvailableDoctor());
       }
     });
@@ -63,7 +90,7 @@ const initializeWebSocket = (server) => {
     socket.on("disconnect", () => {
       removeUser(socketId);
       io.emit("doctor:list", findAvailableDoctor());
-      const connected  = getOnlineUsersWithInfo();
+      const connected = getOnlineUsersWithInfo();
     });
   });
 };
