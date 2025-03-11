@@ -30,33 +30,29 @@ const removeUser = (socketId) => {
   });
 };
 
-const findAvailableDoctor = () => {
-  const availableDoctors = doctorCache.keys().filter((key) => {
-      const user = doctorCache.get(key);
-      return user?.role === "doctor" && user?.status === "online";
-  });
-
-  if (availableDoctors.length === 0) return null;
-  const selectedDoctorKey = availableDoctors[0];
-  return doctorCache.get(selectedDoctorKey);
+const findAvailableDoctors = () => {
+  return doctorCache.keys()
+    .map((key) => doctorCache.get(key))
+    .filter((user) => user?.role === "doctor" && user?.status === "online");
 };
 
-
 const getOnlineUsersWithInfo = () => {
-  const users = doctorCache.mget(doctorCache.keys());
-  return Object.entries(users).map(([key, data]) => ({
-    key,
-    phone: data.phone,
-    role: data.role,
-    status: data.status,
-    socketId: data.socketId
-  }));
+  return doctorCache.keys().map((key) => {
+    const user = doctorCache.get(key);
+    return {
+      key,
+      phone: user.phone,
+      role: user.role,
+      status: user.status,
+      socketId: user.socketId,
+    };
+  });
 };
 
 module.exports = {
   addUser,
   updateUserStatus,
   removeUser,
-  findAvailableDoctor,
+  findAvailableDoctors,
   getOnlineUsersWithInfo,
 };
