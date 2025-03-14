@@ -61,7 +61,7 @@ const initializeWebSocket = (server) => {
         startTime: Date.now(),
       };
 
-      attemptCallToNextDoctor(socket, phone, [...availableDoctors], io); // Clone the array to avoid mutation issues
+      attemptCallToNextDoctor(socket, phone, [...availableDoctors], io);
     });
 
     socket.on("call:accept", () => {
@@ -218,6 +218,39 @@ const initializeWebSocket = (server) => {
         updateUserStatus(phone, role, "online");
         io.emit("doctor:list", findAvailableDoctors());
       }
+    });
+
+    socket.on("call:cancel", () => {
+      if (role !== "patient") return;
+    
+      console.log(`🚫 Patient ${phone} cancelling call before acceptance`);
+      
+      if (!activeCalls[phone] || !activeCalls[phone].inProgress) {
+        console.log(`⚠️ No active call to cancel for patient ${phone}`);
+        return;
+      }
+    
+      const doctorPhone = activeCalls[phone].currentDoctorPhone;
+      const doctorSocketId = getOnlineUsersWithInfo()
+        .find(user => user.phone === doctorPhone)?.socketId;
+      
+      if (doctorPhone && doctorSocketId) {
+        console.log(`📣 Notifying doctor ${doctorPhone} about call cancellation`);
+        io.to(doctorSocketId).emit("call:cancelled", {
+          patientId: phone,
+          message: "Patient cancelled the call request"
+        });
+        
+        updateUserStatus(doctorPhone, "doctor", "online");
+      }
+      
+      clearActiveCall(phone);
+      
+      io.emit("doctor:list", findAvailableDoctors());
+      
+      socket.emit("call:cancelled_confirmation", {
+        message: "Call request successfully cancelled"
+      });
     });
 
     socket.on("disconnect", () => {
