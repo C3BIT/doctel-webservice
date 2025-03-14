@@ -17,9 +17,9 @@ const authenticateSocket = async (socket, next) => {
     };
     next();
   } catch (error) {
-    console.log("🚨 Token Expired, notifying client...");
-    socket.emit("token_expired");
-    socket.disconnect();
+    console.log("🚨 Token Expired or Invalid:", error.message);
+    socket.tokenExpired = true;
+    next();
   }
 };
 
