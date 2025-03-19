@@ -5,9 +5,9 @@ const {
   loginDoctorController,
   updateDoctorProfileController,
   uploadDoctorProfileImage,
+  getDoctorProfileController,
 } = require("../controllers/doctor.controller.js");
 const { authenticateDoctor } = require("../middlewares/authMiddleware.js");
-const { profileImageUpload } = require("../configs/multer.js");
 
 const router = Router();
 const storage = multer.memoryStorage();
@@ -31,4 +31,5 @@ router.post(
   upload.single("file"),
   uploadDoctorProfileImage
 );
+router.get("/profile", authenticateDoctor, getDoctorProfileController);
 module.exports = router;

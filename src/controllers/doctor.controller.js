@@ -5,6 +5,7 @@ const {
   verifyPassword,
   updateDoctorProfile,
   updateDoctorImage,
+  getDoctorProfileDetails,
 } = require("../services/doctorService");
 const { statusCodes } = require("../utils/statusCodes");
 const {
@@ -197,9 +198,28 @@ const uploadDoctorProfileImage = async (req, res) => {
   }
 };
 
+const getDoctorProfileController = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const doctorProfile = await getDoctorProfileDetails(doctorId);
+
+    if (!doctorProfile) {
+      throw Object.assign(new Error("Doctor profile not found"), {
+        status: statusCodes.NOT_FOUND,
+        error: { code: 40401 },
+      });
+    }
+
+    return res.success(doctorProfile, "Doctor profile fetched successfully");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
+
 module.exports = {
   registerDoctorController,
   loginDoctorController,
   updateDoctorProfileController,
   uploadDoctorProfileImage,
+  getDoctorProfileController
 };
