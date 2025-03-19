@@ -21,4 +21,29 @@ const doctorLoginSchema = Joi.object({
     .required(),
 });
 
-module.exports = { doctorRegistrationSchema, doctorLoginSchema };
+const updateDoctorProfileSchema = Joi.object({
+  firstName: Joi.string().max(50).optional(),
+  lastName: Joi.string().max(50).optional(),
+  status: Joi.string()
+    .valid("online", "offline", "busy", "connected")
+    .optional(),
+
+  qualification: Joi.string().max(255).optional(),
+  experience: Joi.number().integer().min(0).optional().messages({
+    "number.base": "Experience must be a valid number.",
+    "number.min": "Experience cannot be negative.",
+  }),
+  specialization: Joi.string().max(100).optional(),
+  clinicAddress: Joi.string().optional(),
+  consultationFee: Joi.number().precision(2).min(0).optional().messages({
+    "number.base": "Consultation fee must be a valid number.",
+    "number.min": "Consultation fee cannot be negative.",
+  }),
+  bio: Joi.string().optional(),
+});
+
+module.exports = {
+  doctorRegistrationSchema,
+  doctorLoginSchema,
+  updateDoctorProfileSchema,
+};

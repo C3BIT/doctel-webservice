@@ -22,6 +22,7 @@ router.post("/login", loginDoctorController);
 router.put(
   "/profile/update",
   authenticateDoctor,
+  upload.single("file"),
   updateDoctorProfileController
 );
 router.post(
