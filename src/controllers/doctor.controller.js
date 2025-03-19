@@ -10,11 +10,15 @@ const { statusCodes } = require("../utils/statusCodes");
 const {
   doctorRegistrationSchema,
   doctorLoginSchema,
+  updateDoctorProfileSchema,
 } = require("../validations/doctorValidation");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { generateToken } = require("../utils/jwtHelper");
 const spaceService = require("../services/spaceService");
 const { verifyOtp } = require("../services/otpService");
+const {
+  updateDoctorProfileDetails,
+} = require("../services/doctorProfileService");
 const registerDoctorController = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, password, status } = req.body;
@@ -106,24 +110,71 @@ const loginDoctorController = async (req, res) => {
 
 const updateDoctorProfileController = async (req, res) => {
   try {
-    const { firstName, lastName, phone, status } = req.body;
-    const doctorId = req.user.id;
-    const updateData = {};
-    if (firstName) updateData.firstName = firstName;
-    if (lastName) updateData.lastName = lastName;
-    if (phone) updateData.phone = phone;
-    if (status) updateData.status = status;
-
-    if (Object.keys(updateData).length === 0) {
+    const { error } = updateDoctorProfileSchema.validate(req.body);
+    if (error) {
+      const errorDetails = error.details.map((detail) => ({
+        field: detail.path[0],
+        message: detail.message,
+      }));
       throw Object.assign(new Error(), {
         status: statusCodes.BAD_REQUEST,
-        error: { code: 40002 },
+        error: { code: 40002, details: errorDetails },
       });
     }
 
-    const updatedDoctor = await updateDoctorProfile(doctorId, updateData);
+    const doctorId = req.user.id;
+    const {
+      firstName,
+      lastName,
+      status,
+      qualification,
+      experience,
+      specialization,
+      clinicAddress,
+      consultationFee,
+      bio,
+    } = req.body;
+    let profileImage;
+    if (req.file) {
+      profileImage = await spaceService.profileFileUpload(req.file);
+    }
 
-    return res.success(updatedDoctor, "Doctor profile updated successfully");
+    const doctorUpdateData = {};
+    const profileUpdateData = {};
+
+    if (firstName) doctorUpdateData.firstName = firstName;
+    if (lastName) doctorUpdateData.lastName = lastName;
+    if (status) doctorUpdateData.status = status;
+    if (profileImage) doctorUpdateData.profileImage = profileImage;
+
+    if (qualification) profileUpdateData.qualification = qualification;
+    if (experience) profileUpdateData.experience = experience;
+    if (specialization) profileUpdateData.specialization = specialization;
+    if (clinicAddress) profileUpdateData.clinicAddress = clinicAddress;
+    if (consultationFee) profileUpdateData.consultationFee = consultationFee;
+    if (bio) profileUpdateData.bio = bio;
+    if (
+      Object.keys(doctorUpdateData).length === 0 &&
+      Object.keys(profileUpdateData).length === 0
+    ) {
+      throw Object.assign(new Error("No valid fields to update"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40003, message: "No fields provided for update" },
+      });
+    }
+
+    if (Object.keys(doctorUpdateData).length > 0) {
+      await updateDoctorProfile(doctorId, doctorUpdateData);
+    }
+
+    if (Object.keys(profileUpdateData).length > 0) {
+      await updateDoctorProfileDetails(doctorId, profileUpdateData);
+    }
+
+    return res.success(
+      { message: "Doctor profile updated successfully" },
+      "Profile updated successfully"
+    );
   } catch (error) {
     errorResponseHandler(error, req, res);
   }
