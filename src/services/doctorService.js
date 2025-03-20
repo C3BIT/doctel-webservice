@@ -1,4 +1,4 @@
-const Doctor = require("../models/doctor");
+const { Doctor, DoctorProfile } = require("../models/doctor");
 const bcrypt = require("bcryptjs");
 
 const registerDoctor = async (phone) => {
@@ -23,32 +23,68 @@ const verifyPassword = async (inputPassword, storedPassword) => {
 
 const updateDoctorProfile = async (doctorId, updateData) => {
   const [rowsUpdated] = await Doctor.update(updateData, {
-    where: { id: doctorId }
+    where: { id: doctorId },
   });
-  
+
   if (rowsUpdated > 0) {
     return await Doctor.findByPk(doctorId, {
-      attributes: { exclude: ['id','phone', 'password', 'email', 'createdAt', 'updatedAt'] }
+      attributes: { exclude: ["id", "phone", "createdAt", "updatedAt"] },
     });
   }
-  
+
   return null;
 };
 
 const updateDoctorImage = async (doctorId, imageUrl) => {
   return await Doctor.update(
     { profileImage: imageUrl },
-    { 
+    {
       where: { id: doctorId },
-      returning: true 
+      returning: true,
     }
   );
 };
+
+const getDoctorProfileDetails = async (doctorId) => {
+  try {
+    const doctorProfile = await Doctor.findOne({
+      where: { id: doctorId },
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "phone",
+        "status",
+        "profileImage",
+      ],
+      include: [
+        {
+          model: DoctorProfile,
+          as: "profile",
+          attributes: [
+            "qualification",
+            "experience",
+            "specialization",
+            "clinicAddress",
+            "consultationFee",
+            "bio",
+          ],
+        },
+      ],
+    });
+
+    return doctorProfile;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   registerDoctor,
   findDoctorByEmail,
   findDoctorByPhone,
   verifyPassword,
   updateDoctorProfile,
-  updateDoctorImage
+  updateDoctorImage,
+  getDoctorProfileDetails,
 };

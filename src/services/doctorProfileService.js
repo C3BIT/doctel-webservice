@@ -1,4 +1,5 @@
-const DoctorProfile = require("../models/doctorProfile");
+const { DoctorProfile } = require("../models/doctor");
+
 
 const updateDoctorProfileDetails = async (doctorId, updateData) => {
   try {
