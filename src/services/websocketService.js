@@ -263,6 +263,73 @@ const initializeWebSocket = (server) => {
       });
     });
 
+    socket.on("patient:callend", () => {
+      if (role !== "patient") return;
+    
+      console.log(`🔄 Patient ${phone} ending active call`);
+      
+      const doctorPhone = activeCalls[phone]?.currentDoctorPhone;
+      if (doctorPhone) {
+        const doctorSocketId = getOnlineUsersWithInfo().find(
+          (user) => user.phone === doctorPhone
+        )?.socketId;
+        
+        if (doctorSocketId) {
+          console.log(
+            `📣 Notifying doctor ${doctorPhone} about call end from patient ${phone}`
+          );
+          io.to(doctorSocketId).emit("patient:ended_call", {
+            patientId: phone,
+            message: "Patient has ended the call"
+          });
+          
+          updateUserStatus(doctorPhone, "doctor", "online");
+        }
+      }
+      
+      clearActiveCall(phone);
+      
+      io.emit("doctor:list", findAvailableDoctors());
+      
+      socket.emit("call:ended_confirmation", {
+        message: "Call successfully ended"
+      });
+    });
+    socket.on("doctor:callend", () => {
+      if (role !== "doctor") return;
+    
+      console.log(`🔄 Doctor ${phone} ending active call`);
+      
+      const patientPhone = socket.user.patientPhone;
+      
+      if (!patientPhone) {
+        console.log(`⚠️ No patient associated with doctor ${phone}`);
+        return;
+      }
+      
+      if (!activeCalls[patientPhone]) {
+        console.log(`⚠️ No active call found for patient ${patientPhone}`);
+        return;
+      }
+      
+      console.log(`📣 Notifying patient ${patientPhone} about call end from doctor ${phone}`);
+      
+      io.to(activeCalls[patientPhone].patientSocketId).emit("doctor:ended_call", {
+        doctorId: phone,
+        message: "Doctor has ended the call"
+      });
+      
+      updateUserStatus(phone, role, "online");
+      
+      clearActiveCall(patientPhone);
+      
+      io.emit("doctor:list", findAvailableDoctors());
+      
+      socket.emit("call:ended_confirmation", {
+        message: "Call successfully ended",
+        patientId: patientPhone
+      });
+    });
     socket.on("disconnect", () => {
       console.log(
         `❌ User disconnected: ${socketId} | Role: ${role} | Phone: ${phone}`
