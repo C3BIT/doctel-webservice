@@ -41,6 +41,10 @@ const Patient = sequelize.define(
       type: DataTypes.ENUM("Male", "Female", "Other"),
       allowNull: true,
     },
+    bloodGroup: {
+      type: DataTypes.ENUM("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"),
+      allowNull: true,
+    },
     address: {
       type: DataTypes.TEXT,
       allowNull: true,

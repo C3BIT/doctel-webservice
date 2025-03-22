@@ -40,6 +40,7 @@ const patientUpdateSchema = Joi.object({
   email: Joi.string().email().max(100).optional(),
   dateOfBirth: Joi.date().optional(),
   gender: Joi.string().valid("Male", "Female", "Other").optional(),
+  bloodGroup: Joi.string().valid("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-").optional(),
   address: Joi.string().optional(),
   height: Joi.number().min(30).max(250).optional(),
   weight: Joi.number().min(2).max(300).optional(),

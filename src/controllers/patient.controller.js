@@ -115,7 +115,6 @@ const updatePatientProfileController = async (req, res) => {
   try {
     const patientId = req.user.id;
     const updateData = req.body;
-
     const { error } = patientUpdateSchema.validate(updateData, {
       abortEarly: false,
     });
@@ -160,10 +159,7 @@ const updatePatientProfileController = async (req, res) => {
       updateData
     );
 
-    return res.success(
-      { message: "Patient profile updated successfully", updatedPatient },
-      "Profile updated successfully"
-    );
+    return res.success(updatedPatient, "Patient profile updated successfully");
   } catch (error) {
     errorResponseHandler(error, req, res);
   }
@@ -171,16 +167,14 @@ const updatePatientProfileController = async (req, res) => {
 const getPatientProfileController = async (req, res) => {
   try {
     const patientId = req.user.id;
-    
     const patientProfile = await PatientService.getPatientProfile(patientId);
-    
     if (!patientProfile) {
       throw Object.assign(new Error("Patient profile not found"), {
         status: statusCodes.NOT_FOUND,
         error: { code: 40401 },
       });
     }
-    
+
     return res.success(patientProfile, "Patient profile fetched successfully");
   } catch (error) {
     errorResponseHandler(error, req, res);
@@ -190,5 +184,5 @@ module.exports = {
   registerPatientController,
   updatePatientProfileController,
   loginPatientController,
-  getPatientProfileController
+  getPatientProfileController,
 };
