@@ -2,6 +2,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const { errorResponseHandler } = require("./errorResponseHandler.js");
 const { jwtSecret } = require("../configs/variables.js");
 const { statusCodes } = require("../utils/statusCodes.js");
+const { errorCodes } = require("../utils/errorCodes.js");
 
 const isTokenExpired = (expirationTime) =>
   expirationTime <= Math.floor(Date.now() / 1000);

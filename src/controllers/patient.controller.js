@@ -6,7 +6,9 @@ const { statusCodes } = require("../utils/statusCodes");
 const {
   patientRegistrationSchema,
   patientLoginSchema,
+  patientUpdateSchema,
 } = require("../validations/patientValidation");
+const spaceService = require("../services/spaceService");
 const { generatePatientToken } = require("../utils/jwtHelper");
 
 const registerPatientController = async (req, res) => {
@@ -55,29 +57,6 @@ const registerPatientController = async (req, res) => {
     });
 
     return res.success({}, "Patient registered successfully.");
-  } catch (error) {
-    errorResponseHandler(error, req, res);
-  }
-};
-const updatePatientProfileController = async (req, res) => {
-  try {
-    const updateData = req.body;
-    const { error } = patientUpdateSchema.validate(updateData, {
-      abortEarly: false,
-    });
-    if (error) {
-      throw Object.assign(new Error("Patient profile update failed"), {
-        status: statusCodes.BAD_REQUEST,
-        error: {
-          code: 40002,
-        },
-      });
-    }
-    const updatedPatient = await PatientService.updatePatientProfile(
-      id,
-      updateData
-    );
-    return res.success(updatedPatient, "Patient profile updated successfully.");
   } catch (error) {
     errorResponseHandler(error, req, res);
   }
@@ -132,8 +111,78 @@ const loginPatientController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
+const updatePatientProfileController = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const updateData = req.body;
+    const { error } = patientUpdateSchema.validate(updateData, {
+      abortEarly: false,
+    });
+
+    if (error) {
+      const errorDetails = error.details.map((detail) => ({
+        field: detail.path[0],
+        message: detail.message,
+      }));
+
+      throw Object.assign(new Error("Patient profile update failed"), {
+        status: statusCodes.BAD_REQUEST,
+        error: {
+          code: 40002,
+          reason: "Validation error",
+          details: errorDetails,
+        },
+      });
+    }
+
+    if (Object.keys(updateData).length === 0 && !req.file) {
+      throw Object.assign(new Error("No data provided for update"), {
+        status: statusCodes.BAD_REQUEST,
+        error: {
+          code: 40003,
+          message: "No fields provided for update",
+        },
+      });
+    }
+
+    if (req.file) {
+      const profileImage = await spaceService.profileFileUpload(req.file);
+      updateData.profileImage = profileImage;
+    }
+
+    if (updateData.phone) {
+      delete updateData.phone;
+    }
+
+    const updatedPatient = await PatientService.updatePatientProfile(
+      patientId,
+      updateData
+    );
+
+    return res.success(updatedPatient, "Patient profile updated successfully");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
+const getPatientProfileController = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const patientProfile = await PatientService.getPatientProfile(patientId);
+    if (!patientProfile) {
+      throw Object.assign(new Error("Patient profile not found"), {
+        status: statusCodes.NOT_FOUND,
+        error: { code: 40401 },
+      });
+    }
+
+    return res.success(patientProfile, "Patient profile fetched successfully");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 module.exports = {
   registerPatientController,
   updatePatientProfileController,
   loginPatientController,
+  getPatientProfileController,
 };
