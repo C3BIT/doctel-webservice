@@ -20,6 +20,9 @@ const { verifyOtp } = require("../services/otpService");
 const {
   updateDoctorProfileDetails,
 } = require("../services/doctorProfileService");
+const {
+  createPrescription,
+} = require("../services/prescriptionService");
 const registerDoctorController = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, password, status } = req.body;
@@ -215,11 +218,39 @@ const getDoctorProfileController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
+const createPrescription = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const { patientId } = req.body;
+    if (!patientId) {
+      throw Object.assign(new Error("patientId is required"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40013 },
+      });
+    }
+    if (!req.file) {
+      throw Object.assign(new Error("No Prescription file provided"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40012 },
+      });
+    }
+    const prescriptionUrl = await spaceService.prescriptionFileUpload(req.file);
 
+    const prescription = await createPrescription.create({
+      doctorId,
+      patientId,
+      prescriptionURL: prescriptionUrl
+    });
+    return res.created(prescription, "Prescription created successfully");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 module.exports = {
   registerDoctorController,
   loginDoctorController,
   updateDoctorProfileController,
   uploadDoctorProfileImage,
-  getDoctorProfileController
+  getDoctorProfileController,
+  createPrescription
 };
