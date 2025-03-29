@@ -44,7 +44,14 @@ const errorCodes = {
     reason: "InvalidOtp",
     message: "OTP verification failed",
   },
-
+  40012: {
+    reason: "PrescriptionRequired",
+    message: "Prescription PDF is Required ",
+  },
+  40013: {
+    reason: "PatientIdRequired",
+    message: "PatientId is Required ",
+  },
   // ================== 401 - Unauthorized Errors ==================
   40101: {
     reason: "UnauthorizedAccess",
