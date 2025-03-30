@@ -1,5 +1,5 @@
 const Prescription = require("../models/Prescription");
-const createNewPrescription = async (prescriptionData) => {
+const createPrescription = async (prescriptionData) => {
   try {
     const prescription = await Prescription.create(prescriptionData);
     return prescription;
@@ -8,5 +8,5 @@ const createNewPrescription = async (prescriptionData) => {
   }
 };
 module.exports = {
-  createNewPrescription,
+  createPrescription,
 };
