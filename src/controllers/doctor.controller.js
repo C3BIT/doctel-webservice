@@ -21,7 +21,7 @@ const {
   updateDoctorProfileDetails,
 } = require("../services/doctorProfileService");
 const {
-  createPrescription,
+  createNewPrescription,
 } = require("../services/prescriptionService");
 const registerDoctorController = async (req, res) => {
   try {
@@ -236,7 +236,7 @@ const createPrescription = async (req, res) => {
     }
     const prescriptionUrl = await spaceService.prescriptionFileUpload(req.file);
 
-    const prescription = await createPrescription.create({
+    const prescription = await createNewPrescription.create({
       doctorId,
       patientId,
       prescriptionURL: prescriptionUrl

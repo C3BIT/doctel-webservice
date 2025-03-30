@@ -6,7 +6,7 @@ const {
   updateDoctorProfileController,
   uploadDoctorProfileImage,
   getDoctorProfileController,
-  createPrescription,
+  createNewPrescription,
 } = require("../controllers/doctor.controller.js");
 const { authenticateDoctor } = require("../middlewares/authMiddleware.js");
 
@@ -33,5 +33,5 @@ router.post(
   uploadDoctorProfileImage
 );
 router.get("/profile", authenticateDoctor, getDoctorProfileController);
-router.post("/upload/prescription", authenticateDoctor, upload.single("file"), createPrescription);
+router.post("/upload/prescription", authenticateDoctor, upload.single("file"), createNewPrescription);
 module.exports = router;
