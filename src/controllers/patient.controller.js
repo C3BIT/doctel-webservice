@@ -180,9 +180,35 @@ const getPatientProfileController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
+
+const getPatientInfoController = async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      throw Object.assign(new Error("Phone number is required"), {
+        status: statusCodes.BAD_REQUEST,
+        error: { code: 40004, message: "Phone number is required" },
+      });
+    }
+
+    const patient = await PatientService.findPatientByPhone(phone);
+    if (!patient) {
+      throw Object.assign(new Error("Patient not found"), {
+        status: statusCodes.NOT_FOUND,
+        error: { code: 40401 },
+      });
+    }
+
+    return res.success(patient, "Patient information fetched successfully.");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 module.exports = {
   registerPatientController,
   updatePatientProfileController,
   loginPatientController,
   getPatientProfileController,
+  getPatientInfoController
 };

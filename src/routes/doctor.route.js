@@ -9,6 +9,7 @@ const {
   createPrescriptionController,
 } = require("../controllers/doctor.controller.js");
 const { authenticateDoctor } = require("../middlewares/authMiddleware.js");
+const { getPatientInfoController } = require("../controllers/patient.controller.js");
 
 const router = Router();
 const storage = multer.memoryStorage();
@@ -33,5 +34,6 @@ router.post(
   uploadDoctorProfileImage
 );
 router.get("/profile", authenticateDoctor, getDoctorProfileController);
+router.get("/patient-info", authenticateDoctor, getPatientInfoController);
 router.post("/upload/prescription", authenticateDoctor, upload.single("file"), createPrescriptionController);
 module.exports = router;
