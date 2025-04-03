@@ -3,15 +3,18 @@ const axios = require("axios");
 const SMS_API_URL = "https://api.sms.net.bd/sendsms";
 const API_KEY = process.env.SMS_API_KEY;
 const OTP_EXPIRY_TIME = 150;
+const generateOtp = () => {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+};
 const storeOtp = async (phone) => {
-  const otp = "1234";
+  const otp = generateOtp();
   otpCache.del(phone);
   otpCache.set(phone, otp, OTP_EXPIRY_TIME);
-  // const message = `Your DOCTEL OTP Code is ${otp}.`;
-  // const url = `${SMS_API_URL}?api_key=${API_KEY}&msg=${encodeURIComponent(
-  //   message
-  // )}&to=${phone}`;
-  // await axios.get(url);
+  const message = `Your DOCTEL OTP Code is ${otp}.`;
+  const url = `${SMS_API_URL}?api_key=${API_KEY}&msg=${encodeURIComponent(
+    message
+  )}&to=${phone}`;
+  await axios.get(url);
 };
 
 const verifyOtp = async (phone, otp) => {
