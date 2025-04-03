@@ -235,8 +235,7 @@ const createPrescriptionController = async (req, res) => {
       });
     }
     const prescriptionUrl = await spaceService.prescriptionFileUpload(req.file);
-
-    const prescription = await createPrescription.create({
+    const prescription = await createPrescription({
       doctorId,
       patientId,
       prescriptionURL: prescriptionUrl
