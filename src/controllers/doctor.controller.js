@@ -16,13 +16,14 @@ const {
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { generateToken } = require("../utils/jwtHelper");
 const spaceService = require("../services/spaceService");
-const { verifyOtp } = require("../services/otpService");
+const { verifyOtp, sendPrescriptionLink } = require("../services/otpService");
 const {
   updateDoctorProfileDetails,
 } = require("../services/doctorProfileService");
 const {
   createPrescription,
 } = require("../services/prescriptionService");
+const { findPatientByPhone } = require("../services/patientService");
 const registerDoctorController = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, password, status } = req.body;
@@ -221,13 +222,14 @@ const getDoctorProfileController = async (req, res) => {
 const createPrescriptionController = async (req, res) => {
   try {
     const doctorId = req.user.id;
-    const { patientId } = req.body;
-    if (!patientId) {
+    const { phone } = req.body;
+    if (!phone) {
       throw Object.assign(new Error("patientId is required"), {
         status: statusCodes.BAD_REQUEST,
         error: { code: 40013 },
       });
     }
+    const patient = await findPatientByPhone(phone);
     if (!req.file) {
       throw Object.assign(new Error("No Prescription file provided"), {
         status: statusCodes.BAD_REQUEST,
@@ -235,9 +237,10 @@ const createPrescriptionController = async (req, res) => {
       });
     }
     const prescriptionUrl = await spaceService.prescriptionFileUpload(req.file);
+    await sendPrescriptionLink(phone, prescriptionUrl)
     const prescription = await createPrescription({
       doctorId,
-      patientId,
+      patientId: patient.id,
       prescriptionURL: prescriptionUrl
     });
     return res.created(prescription, "Prescription created successfully");
