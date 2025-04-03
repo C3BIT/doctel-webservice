@@ -218,7 +218,7 @@ const getDoctorProfileController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
-const createPrescription = async (req, res) => {
+const createPrescriptionController = async (req, res) => {
   try {
     const doctorId = req.user.id;
     const { patientId } = req.body;
@@ -235,8 +235,7 @@ const createPrescription = async (req, res) => {
       });
     }
     const prescriptionUrl = await spaceService.prescriptionFileUpload(req.file);
-
-    const prescription = await createPrescription.create({
+    const prescription = await createPrescription({
       doctorId,
       patientId,
       prescriptionURL: prescriptionUrl
@@ -252,5 +251,5 @@ module.exports = {
   updateDoctorProfileController,
   uploadDoctorProfileImage,
   getDoctorProfileController,
-  createPrescription
+  createPrescriptionController
 };
