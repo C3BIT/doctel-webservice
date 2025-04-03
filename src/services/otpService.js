@@ -22,11 +22,16 @@ const verifyOtp = async (phone, otp) => {
   otpCache.del(phone);
   return true;
 };
+const shortenUrlTiny = async (longUrl) => {
+  const response = await axios.get(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+  return response.data;
+};
 
 const sendPrescriptionLink = async (phone, prescriptionUrl) => {
   if (!phone || !prescriptionUrl)
     throw new Error("Phone number and prescription URL are required");
-  const message = `Your prescription is ready. Click the link to view your prescription: ${prescriptionUrl}`;
+  const shortUrl = await shortenUrlTiny(prescriptionUrl);
+  const message = `Your prescription is ready. Click the link to view your prescription: ${shortUrl}`;
   const url = `${SMS_API_URL}?api_key=${API_KEY}&msg=${encodeURIComponent(
     message
   )}&to=${phone}`;
