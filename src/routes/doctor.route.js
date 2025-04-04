@@ -34,6 +34,6 @@ router.post(
   uploadDoctorProfileImage
 );
 router.get("/profile", authenticateDoctor, getDoctorProfileController);
-router.get("/patient-info", authenticateDoctor, getPatientInfoController);
+router.post("/patient-info", authenticateDoctor, getPatientInfoController);
 router.post("/upload/prescription", authenticateDoctor, upload.single("file"), createPrescriptionController);
 module.exports = router;
