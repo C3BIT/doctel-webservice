@@ -5,6 +5,7 @@ const {
   updatePatientProfileController,
   loginPatientController,
   getPatientProfileController,
+  getPatientPrescriptionsController,
 } = require("../controllers/patient.controller");
 const { authenticatePatient } = require("../middlewares/authMiddleware");
 
@@ -26,4 +27,5 @@ router.put(
 );
 
 router.get("/profile", authenticatePatient, getPatientProfileController);
+router.get("/prescriptions", authenticatePatient, getPatientPrescriptionsController);
 module.exports = router;
