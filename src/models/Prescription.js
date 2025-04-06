@@ -11,7 +11,7 @@ const Prescription = sequelize.define("Prescription", {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'doctors', 
+      model: 'doctors',
       key: 'id'
     }
   },
@@ -37,6 +37,14 @@ const Prescription = sequelize.define("Prescription", {
 }, {
   tableName: "prescriptions",
   timestamps: true,
+  indexes: [
+    {
+      fields: ['patientId']
+    },
+    {
+      fields: ['doctorId']
+    }
+  ]
 });
 
 module.exports = Prescription;

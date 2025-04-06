@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const OtpService = require("../services/otpService");
 const PatientService = require("../services/patientService");
+const PrescriptionService = require("../services/prescriptionService");
 const { errorResponseHandler } = require("../middlewares/errorResponseHandler");
 const { statusCodes } = require("../utils/statusCodes");
 const {
@@ -205,10 +206,23 @@ const getPatientInfoController = async (req, res) => {
     errorResponseHandler(error, req, res);
   }
 };
+
+const getPatientPrescriptionsController = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+
+    const prescriptions = await PrescriptionService.getPrescriptionsByPatientId(patientId);
+
+    return res.success(prescriptions, "Prescriptions fetched successfully.");
+  } catch (error) {
+    errorResponseHandler(error, req, res);
+  }
+};
 module.exports = {
   registerPatientController,
   updatePatientProfileController,
   loginPatientController,
   getPatientProfileController,
-  getPatientInfoController
+  getPatientInfoController,
+  getPatientPrescriptionsController
 };
