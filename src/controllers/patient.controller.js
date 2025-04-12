@@ -101,11 +101,22 @@ const loginPatientController = async (req, res) => {
       });
     }
 
-    const token = generatePatientToken({
-      id: patient.id,
-      phone: patient.phone,
+    const {
+      id,
+      firstName,
+      lastName,
+      profileImage,
+    } = patient || {};
+    
+    const tokenPayload = {
+      id,
+      phone,
       role: "patient",
-    });
+      ...(firstName && lastName && { name: `${firstName} ${lastName}` }),
+      ...(profileImage && { image: profileImage }),
+    };
+    
+    const token = generatePatientToken(tokenPayload);
 
     return res.success({ phone, token }, "Patient logged in successfully.");
   } catch (error) {

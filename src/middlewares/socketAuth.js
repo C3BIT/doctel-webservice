@@ -13,7 +13,9 @@ const authenticateSocket = async (socket, next) => {
     socket.user = {
       id: decoded.id,
       role: decoded.role,
-      phone: decoded.phone
+      phone: decoded.phone,
+      ...(decoded.name && { name: decoded.name }),
+      ...(decoded.image && { image: decoded.image }),
     };
     next();
   } catch (error) {
