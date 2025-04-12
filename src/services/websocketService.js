@@ -25,13 +25,14 @@ const initializeWebSocket = (server) => {
       }, 100);
       return;
     }
-    const { id, role, phone } = socket.user;
+    const { id, role, phone, name, image } = socket.user;
     const socketId = socket.id.toString();
 
     console.log(
-      `✅ User connected: ${socketId} | Role: ${role} | Phone: ${phone}`
+      `✅ User connected: ${socketId} | Role: ${role} | Phone: ${phone}` +
+      (name ? ` | Name: ${name}` : "")
     );
-    addUser(phone, role, socketId);
+    addUser(id, phone, role, socketId, name, image);
     io.emit("doctor:list", findAvailableDoctors());
     console.log(
       "Online users:",
@@ -66,6 +67,8 @@ const initializeWebSocket = (server) => {
         currentDoctorPhone: null,
         timeout: null,
         startTime: Date.now(),
+        patientName: name || null,
+        patientImage: image || null
       };
 
       attemptCallToNextDoctor(socket, phone, [...availableDoctors], io);
@@ -411,10 +414,15 @@ const attemptCallToNextDoctor = (socket, patientPhone, doctorQueue, io) => {
     patientId: patientPhone,
     patientSocketId: activeCalls[patientPhone].patientSocketId,
     jitsiRoom: jitsiRoomLink,
+    patientName: activeCalls[patientPhone].patientName,
+    patientImage: activeCalls[patientPhone].patientImage,
+    patientPhone: patientPhone
   });
 
   io.to(activeCalls[patientPhone].patientSocketId).emit("call:initiated", {
     doctorId: selectedDoctor.phone,
+    doctorName: selectedDoctor.name || null,
+    doctorImage: selectedDoctor.image || null,
     jitsiRoom: jitsiRoomLink,
   });
 

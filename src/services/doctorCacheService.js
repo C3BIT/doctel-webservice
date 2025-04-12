@@ -1,13 +1,16 @@
 const { doctorCache } = require("../utils/memoryCache");
 
-const addUser = (phone, role, socketId) => {
+const addUser = (id, phone, role, socketId, name, image) => {
   const uniqueKey = `${role}_${phone}`;
 
   doctorCache.set(uniqueKey, {
+    id,
     phone,
     socketId,
     role,
     status: role === "doctor" ? "online" : "patient",
+    ...(name && { name }),
+    ...(image && { image }),
   });
 
   return uniqueKey;
@@ -45,6 +48,8 @@ const getOnlineUsersWithInfo = () => {
       role: user.role,
       status: user.status,
       socketId: user.socketId,
+      ...(user.name && { name: user.name }),
+      ...(user.image && { image: user.image }),
     };
   });
 };

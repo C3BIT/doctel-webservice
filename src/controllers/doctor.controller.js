@@ -95,11 +95,22 @@ const loginDoctorController = async (req, res) => {
       doctor = await registerDoctor(phone);
     }
 
-    const token = generateToken({
-      id: doctor.id,
-      phone: doctor.phone,
+    const {
+      id,
+      firstName,
+      lastName,
+      profileImage,
+    } = doctor || {};
+    
+    const tokenPayload = {
+      id,
+      phone,
       role: "doctor",
-    });
+      ...(firstName && lastName && { name: `${firstName} ${lastName}` }),
+      ...(profileImage && { image: profileImage }),
+    };
+    
+    const token = generateToken(tokenPayload);
 
     return res.success(
       {
